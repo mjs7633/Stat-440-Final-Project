@@ -16,7 +16,9 @@ library("stats")
 ```
 
 ```{r}
-Happy<- read.csv("C:/Users/bball/Downloads/2019.csv")
-head(Happy)
+Happy2019<- read.csv("2019.csv")
+head(Happy2019)
+Happy2018<- read.csv("2018.csv")
+head(Happy2018)
 ```
 
