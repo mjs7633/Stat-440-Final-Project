@@ -15,6 +15,8 @@ library("tidyr")
 library("ggplot2")
 library("mosaic")
 library("stats")
+library("rpart")
+library("partykit")
 ```
 
 ```{r}
@@ -80,10 +82,55 @@ pairs(train)
 ```
 
 
-## Null Model
+### Null Model
 ```{r}
 mod_null <- tally(~ happy, data = train)
 mod_null
 ```
 
+
+
+### Decision Tree (simple)
+```{r}
+rpart(happy ~ gdp_per_capita, data = Happy2019)
+```
+
+```{r}
+split <- .675 # first split from simple `rpart`
+
+train %>%
+  mutate(elevated_happiness = gdp_per_capita >= split) %>%
+  ggplot(aes(x = gdp_per_capita, y = happy)) + 
+  geom_point(aes(color = elevated_happiness, alpha =.04)) + 
+  geom_vline(xintercept = split, color = "blue", lty = 2)
+```
+
+
+
+### Decision Tree (Complete)
+```{r}
+mod_tree <- rpart(happy ~ gdp_per_capita + social_support + life_expectancy + freedom + generosity + corruption, data = Happy2019)
+mod_tree
+```
+
+```{r}
+plot(as.party(mod_tree))
+```
+
+```{r}
+printcp(mod_tree)
+```
+
+```{r}
+#train_tree <- 
+ # train %>%
+ # mutate(happy_dtree = predict(mod_tree, type = class))
+#confusion <- tally(happy_dtree ~ happy, data = train_tree, format = count)
+#confusion
+```
+
+```{r}
+#dtree_acc <- sum(diag(confusion)) / nrow(train) * 100
+#dtree_acc
+```
 
