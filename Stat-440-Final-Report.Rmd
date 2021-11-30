@@ -5,6 +5,8 @@ date: "11/30/2021"
 output: html_document
 ---
 
+## Front Matter
+
 ```{r setup, include=FALSE}
 rm(list = ls())
 library("readxl")
@@ -16,14 +18,46 @@ library("stats")
 ```
 
 ```{r}
-Happy2019<- read.csv("2019.csv")
+Happy2019_raw<- read.csv("2019.csv")
 head(Happy2019)
-Happy2018<- read.csv("2018.csv")
+
+Happy2018_raw<- read.csv("2018.csv")
 head(Happy2018)
 ```
 
+
+## Clean Data
+
 ```{r}
-hi
+Happy2019 <-
+  Happy2019_raw %>%
+  rename(happiness_rank = Overall.rank,
+    country = Country.or.region,
+    score = Score,
+    gdp_per_capita = GDP.per.capita,
+    social_support = Social.support,
+    life_expectancy = Healthy.life.expectancy,
+    freedom = Freedom.to.make.life.choices,
+    generosity = Generosity,
+    corruption = Perceptions.of.corruption
+)
+
+Happy2019
+
+Happy2018 <-
+  Happy2018_raw %>%
+  rename(happiness_rank = Overall.rank,
+    country = Country.or.region,
+    score = Score,
+    gdp_per_capita = GDP.per.capita,
+    social_support = Social.support,
+    life_expectancy = Healthy.life.expectancy,
+    freedom = Freedom.to.make.life.choices,
+    generosity = Generosity,
+    corruption = Perceptions.of.corruption
+)
+
+Happy2018
 ```
 
 
