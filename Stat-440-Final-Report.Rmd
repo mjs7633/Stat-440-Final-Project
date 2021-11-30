@@ -1,0 +1,22 @@
+---
+title: "Stat 440 Final Project"
+author: "Matthew Secen"
+date: "11/30/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+rm(list = ls())
+library("readxl")
+library("dplyr")
+library("tidyr")
+library("ggplot2")
+library("mosaic")
+library("stats")
+```
+
+```{r}
+Happy<- read.csv("C:/Users/bball/Downloads/2019.csv")
+head(Happy)
+```
+
