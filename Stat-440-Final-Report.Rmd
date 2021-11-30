@@ -19,10 +19,10 @@ library("stats")
 
 ```{r}
 Happy2019_raw<- read.csv("2019.csv")
-head(Happy2019)
+head(Happy2019_raw)
 
 Happy2018_raw<- read.csv("2018.csv")
-head(Happy2018)
+head(Happy2018_raw)
 ```
 
 
@@ -40,9 +40,11 @@ Happy2019 <-
     freedom = Freedom.to.make.life.choices,
     generosity = Generosity,
     corruption = Perceptions.of.corruption
-)
+) %>%
+  mutate(happy = as.factor(ifelse(score >= 5, "yes", "no")))
 
 Happy2019
+
 
 Happy2018 <-
   Happy2018_raw %>%
@@ -55,12 +57,33 @@ Happy2018 <-
     freedom = Freedom.to.make.life.choices,
     generosity = Generosity,
     corruption = Perceptions.of.corruption
-)
+) %>%
+  mutate(happy = as.factor(ifelse(score >= 5, "yes", "no")))
 
 Happy2018
 ```
 
 
+## Partition the Data
 ```{r}
-Vince!
+set.seed(440)
+
+n <-nrow(Happy2019)
+test_idx <- sample.int(n, size = round(.25*n))
+
+train <- Happy2019[-test_idx,]
+nrow(train)
+test <- Happy2019[test_idx,]
+nrow(test)
+
+pairs(train)
 ```
+
+
+## Null Model
+```{r}
+mod_null <- tally(~ happy, data = train)
+mod_null
+```
+
+
