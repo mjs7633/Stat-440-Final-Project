@@ -21,6 +21,7 @@ library("partykit")
 library("randomForest")
 library("tibble")
 library("gbm")
+set.seed(440)
 ```
 
 ```{r}
@@ -162,7 +163,7 @@ train_boost <-
   train %>%
   mutate(happy01 = if_else(happy == "yes", 1, 0)) %>%
   select(-happy)
-mod_boost <- gbm(happy01 ~ ., distribution = "bernoulli",   # because it's a classifier model
+mod_boost <- gbm(happy01 ~ gdp_per_capita + social_support + life_expectancy + freedom + generosity + corruption, distribution = "bernoulli",   # because it's a classifier model
                      data = train_boost, n.trees = 3000, interaction.depth = 2) 
 # the relative influence is similar to importance result earlier
 msummary(mod_boost)
