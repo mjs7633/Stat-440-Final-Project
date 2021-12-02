@@ -18,6 +18,9 @@ library("stats")
 library("rpart")
 #install.packages("partykit")
 library("partykit")
+library("randomForest")
+library("tibble")
+library("gbm")
 ```
 
 ```{r}
@@ -129,14 +132,39 @@ train_tree <-
 
 confusion <- tally(happy_dtree ~ happy, data = train_tree, format = "count")
 confusion
-```
 
-```{r}
 dtree_acc <- sum(diag(confusion)) / nrow(train) * 100
 dtree_acc
 ```
 
+### Random Forrest
 
+```{r}
+mod_forest <- randomForest(happy ~ gdp_per_capita + social_support + life_expectancy + freedom + generosity + corruption, data = train, ntree = 2000, mtry = 2)
+mod_forest
+
+rf_acc <- sum(diag(mod_forest$confusion)) / nrow(train) * 100
+rf_acc
+```
+
+```{r}
+importance(mod_forest) %>%
+  as.data.frame() %>%
+  rownames_to_column() %>%  # handy function from `tibble` package
+  arrange(desc(MeanDecreaseGini))
+```
+
+```{r}
+# response must be converted to 0/1
+train_boost <- 
+  train %>%
+  mutate(happy01 = if_else(happy == "yes", 1, 0)) %>%
+  select(-happy)
+mod_boost <- gbm(happy01 ~ ., distribution = "bernoulli",   # because it's a classifier model
+                     data = train_boost, n.trees = 3000, interaction.depth = 2) 
+# the relative influence is similar to importance result earlier
+msummary(mod_boost)
+```
 
 
 
