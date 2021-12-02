@@ -195,6 +195,27 @@ knn_acc
 ```
 
 
+### Logistic Regression Model
+
+
+```{r}
+# logistic
+mod_logit <- glm(happy ~ gdp_per_capita, data = train, family = 'binomial')
+msummary(mod_logit)
+
+happy_logitProb <- predict(mod_logit, newdata = train, type = 'response')
+happy_logit <- ifelse(happy_logitProb > 0.5, yes = 'yes', 'no')
+confusion <- tally(happy_logit ~ happy, data = train, format = 'count')
+
+
+logit_acc <- sum(diag(confusion)) / nrow(train) * 100
+logit_acc
+
+```
+
+
+
+
 
 
 
