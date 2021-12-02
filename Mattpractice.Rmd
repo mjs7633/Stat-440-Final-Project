@@ -1,18 +1,205 @@
 ---
-title: "R Notebook"
-output: html_notebook
+title: "Stat 440 Final Project"
+author: "Matthew Secen"
+date: "11/30/2021"
+output: html_document
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+## Front Matter
 
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
-
-```{r}
-plot(cars)
+```{r setup, include=FALSE}
+rm(list = ls())
+library("readxl")
+library("dplyr")
+library("tidyr")
+library("ggplot2")
+library("mosaic")
+library("stats")
+library("rpart")
+library("partykit")
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+```{r}
+Happy2019_raw<- read.csv("2019.csv")
+head(Happy2019_raw)
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+Happy2018_raw<- read.csv("2018.csv")
+head(Happy2018_raw)
+```
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+## Clean Data
+
+```{r}
+Happy2019 <-
+  Happy2019_raw %>%
+  rename(happiness_rank = Overall.rank,
+    country = Country.or.region,
+    score = Score,
+    gdp_per_capita = GDP.per.capita,
+    social_support = Social.support,
+    life_expectancy = Healthy.life.expectancy,
+    freedom = Freedom.to.make.life.choices,
+    generosity = Generosity,
+    corruption = Perceptions.of.corruption
+) %>%
+  mutate(happy = as.factor(ifelse(score >= 5, "yes", "no")),
+         wealthy = as.factor(ifelse(gdp_per_capita >= 1, "yes", "no")))
+
+Happy2019
+
+
+Happy2018 <-
+  Happy2018_raw %>%
+  rename(happiness_rank = Overall.rank,
+    country = Country.or.region,
+    score = Score,
+    gdp_per_capita = GDP.per.capita,
+    social_support = Social.support,
+    life_expectancy = Healthy.life.expectancy,
+    freedom = Freedom.to.make.life.choices,
+    generosity = Generosity,
+    corruption = Perceptions.of.corruption
+) %>%
+  mutate(happy = as.factor(ifelse(score >= 5, "yes", "no")),
+         wealthy = as.factor(ifelse(gdp_per_capita >= 1, "yes", "no")))
+
+Happy2018
+```
+
+
+## Partition the Data
+```{r}
+set.seed(440)
+
+n <-nrow(Happy2019)
+test_idx <- sample.int(n, size = round(.25*n))
+
+train <- Happy2019[-test_idx,]
+nrow(train)
+test <- Happy2019[test_idx,]
+nrow(test)
+train
+
+#pairs(train)
+```
+
+
+### Null Model
+```{r}
+mod_null <- tally(~ happy, data = train)
+mod_null
+```
+
+
+
+### Decision Tree (simple)
+```{r}
+rpart(happy ~ gdp_per_capita, data = Happy2019)
+```
+
+```{r}
+split <- .675 # first split from simple `rpart`
+
+train %>%
+  mutate(elevated_happiness = gdp_per_capita >= split) %>%
+  ggplot(aes(x = gdp_per_capita, y = happy)) + 
+  geom_point(aes(color = elevated_happiness, alpha =.04)) + 
+  geom_vline(xintercept = split, color = "blue", lty = 2)
+```
+
+
+
+### Decision Tree (Complete)
+```{r}
+mod_tree <- rpart(happy ~ gdp_per_capita + social_support + life_expectancy + freedom + generosity + corruption, data = Happy2019)
+mod_tree
+```
+
+```{r}
+plot(as.party(mod_tree))
+```
+
+```{r}
+printcp(mod_tree)
+```
+
+```{r}
+#train_tree <- 
+ # train %>%
+ # mutate(happy_dtree = predict(mod_tree, type = class))
+#confusion <- tally(happy_dtree ~ happy, data = train_tree, format = count)
+#confusion
+```
+
+```{r}
+#dtree_acc <- sum(diag(confusion)) / nrow(train) * 100
+#dtree_acc
+```
+
+```{r}
+#Naive Bayes
+head(train, 1)
+train
+
+tally(wealthy ~ happy, data = train, margins = TRUE)
+tally( ~ wealthy, data = train, margins = TRUE)
+tally( ~ happy, data = train, margins = TRUE)
+
+require(e1071)  # awful name for a package...
+
+mod_nb <- naiveBayes(happy ~ ., data = train)
+happy_nb <- predict(mod_nb, newdata = train)
+confusion <- tally(happy_nb ~ happy, data = train, format = "count")
+confusion
+
+nb_acc <- sum(diag(confusion)) / nrow(train) * 100
+nb_acc
+```
+```{r}
+#Artificial Neural Networks
+require(nnet)
+mod_nnet <- nnet(happy ~ ., data = train, size = 7)
+happy_nn <- predict(mod_nnet, newdata = train, type = "class")
+confusion <- tally(happy_nn ~ happy, data = train, format = "count")
+confusion
+
+nnet_acc <- sum(diag(confusion)) / nrow(train) * 100
+nnet_acc
+```
+
+# plot ANN
+plot.nnet(mod_nnet)
+```{r}
+#Plotting ANN
+
+# import function from Github 
+library("devtools")
+source_url('https://gist.githubusercontent.com/fawda123/7471137/raw/466c1474d0a505ff044412703516c34f1a4684a5/nnet_plot_update.r')
+
+```
+
+```{r}
+install.packages("devtools", type = "win.binary")
+```
+
+
+
+
+ModelComparison <- 
+  tribble(
+  ~model, ~accuracy, 
+  "**NULL MODEL**", mod_null[1], 
+  "decision tree", dtree_acc, 
+  "random forest", rf_acc, 
+  "k-nearest neighbors", knn_acc, 
+  "naive Bayes", nb_acc, 
+  "neural network", nnet_acc, 
+  "logistic regression", logit_acc
+)
+ModelComparison %>%
+  arrange(desc(accuracy))
+
+
+
+
