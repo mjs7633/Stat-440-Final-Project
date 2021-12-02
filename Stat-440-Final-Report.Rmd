@@ -16,6 +16,7 @@ library("ggplot2")
 library("mosaic")
 library("stats")
 library("rpart")
+#install.packages("partykit")
 library("partykit")
 ```
 
@@ -78,7 +79,7 @@ nrow(train)
 test <- Happy2019[test_idx,]
 nrow(test)
 
-pairs(train)
+#pairs(train)
 ```
 
 
@@ -134,4 +135,68 @@ confusion
 dtree_acc <- sum(diag(confusion)) / nrow(train) * 100
 dtree_acc
 ```
+
+
+
+
+
+### K-Nearest Neighbor
+
+```{r}
+#install.packages('mdsr')
+library(mdsr)
+#install.packages('nycflights13')
+library(nycflights13)
+library(tidyverse)
+library(lubridate)
+library(mosaic)
+library(googlesheets)
+library(babynames)
+library(Hmisc)
+library(dplyr)
+#install.packages('Lahman')
+library(Lahman)
+library(rvest)
+library(methods)
+library(readr)
+library(rpart)
+library(partykit)
+#install.packages('randomForest')
+library(randomForest)
+library(tibble)
+library(class)
+#install.packages('e1071')
+library(e1071)
+library(nnet)
+#install.packages("ROCR")
+library(ROCR)
+#install.packages("NHANES")
+library(NHANES)
+
+```
+
+
+```{r}
+require(class)
+Happy2019$gdp_per_capita<-as.numeric(as.integer(factor(Happy2019$gdp_per_capita)))
+train_quant <- 
+  Happy2019 %>%
+  select(gdp_per_capita)
+# KNN classifier
+
+
+happy_knn <- knn(train = train_quant, test = train_quant, cl = Happy2019$happy, k = 5)
+# confusion matrix
+
+confusion <- tally(happy_knn ~ happy, data = Happy2019, format = "count")
+
+
+knn_acc <- sum(diag(confusion)) / nrow(train_quant) * 100
+knn_acc
+```
+
+
+
+
+
 
