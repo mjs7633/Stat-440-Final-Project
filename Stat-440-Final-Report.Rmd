@@ -209,6 +209,39 @@ knn_acc <- sum(diag(confusion)) / nrow(train_quant) * 100
 knn_acc
 ```
 
+```{r}
+#Naive Bayes
+head(train, 1)
+train
+
+tally(wealthy ~ happy, data = train, margins = TRUE)
+tally( ~ wealthy, data = train, margins = TRUE)
+tally( ~ happy, data = train, margins = TRUE)
+
+require(e1071)  # awful name for a package...
+
+mod_nb <- naiveBayes(happy ~ ., data = train)
+happy_nb <- predict(mod_nb, newdata = train)
+confusion <- tally(happy_nb ~ happy, data = train, format = "count")
+confusion
+
+nb_acc <- sum(diag(confusion)) / nrow(train) * 100
+nb_acc
+```
+
+```{r}
+#Artificial Neural Networks
+require(nnet)
+mod_nnet <- nnet(happy ~ ., data = train, size = 7)
+happy_nn <- predict(mod_nnet, newdata = train, type = "class")
+confusion <- tally(happy_nn ~ happy, data = train, format = "count")
+confusion
+
+nnet_acc <- sum(diag(confusion)) / nrow(train) * 100
+nnet_acc
+```
+
+
 
 ### Logistic Regression Model
 
@@ -230,6 +263,21 @@ logit_acc
 ```
 
 
+```{r}
+ModelComparison <- 
+  tribble(
+  ~model, ~accuracy, 
+  "**NULL MODEL**", mod_null[1], 
+  "decision tree", dtree_acc, 
+  "random forest", rf_acc, 
+  "k-nearest neighbors", knn_acc, 
+  "naive Bayes", nb_acc, 
+  "neural network", nnet_acc, 
+  "logistic regression", logit_acc
+)
+ModelComparison %>%
+  arrange(desc(accuracy))
+```
 
 
 
