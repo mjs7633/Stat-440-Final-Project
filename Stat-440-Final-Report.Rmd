@@ -92,7 +92,7 @@ mod_null
 
 ### Decision Tree (simple)
 ```{r}
-rpart(happy ~ gdp_per_capita, data = Happy2019)
+rpart(happy ~ gdp_per_capita, data = train)
 ```
 
 ```{r}
@@ -109,7 +109,7 @@ train %>%
 
 ### Decision Tree (Complete)
 ```{r}
-mod_tree <- rpart(happy ~ gdp_per_capita + social_support + life_expectancy + freedom + generosity + corruption, data = Happy2019)
+mod_tree <- rpart(happy ~ gdp_per_capita + social_support + life_expectancy + freedom + generosity + corruption, data = train)
 mod_tree
 ```
 
@@ -122,15 +122,16 @@ printcp(mod_tree)
 ```
 
 ```{r}
-#train_tree <- 
- # train %>%
- # mutate(happy_dtree = predict(mod_tree, type = class))
-#confusion <- tally(happy_dtree ~ happy, data = train_tree, format = count)
-#confusion
+train_tree <- 
+  train %>%
+  mutate(happy_dtree = predict(mod_tree, type = "class"))
+
+confusion <- tally(happy_dtree ~ happy, data = train_tree, format = "count")
+confusion
 ```
 
 ```{r}
-#dtree_acc <- sum(diag(confusion)) / nrow(train) * 100
-#dtree_acc
+dtree_acc <- sum(diag(confusion)) / nrow(train) * 100
+dtree_acc
 ```
 
