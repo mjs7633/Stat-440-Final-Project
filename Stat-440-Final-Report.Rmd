@@ -77,8 +77,9 @@ train <- Happy2019[-test_idx,]
 nrow(train)
 test <- Happy2019[test_idx,]
 nrow(test)
+train
 
-pairs(train)
+#pairs(train)
 ```
 
 
