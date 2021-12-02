@@ -16,6 +16,7 @@ library("ggplot2")
 library("mosaic")
 library("stats")
 library("rpart")
+#install.packages("partykit")
 library("partykit")
 ```
 
@@ -93,7 +94,7 @@ mod_null
 
 ### Decision Tree (simple)
 ```{r}
-rpart(happy ~ gdp_per_capita, data = Happy2019)
+rpart(happy ~ gdp_per_capita, data = train)
 ```
 
 ```{r}
@@ -110,7 +111,7 @@ train %>%
 
 ### Decision Tree (Complete)
 ```{r}
-mod_tree <- rpart(happy ~ gdp_per_capita + social_support + life_expectancy + freedom + generosity + corruption, data = Happy2019)
+mod_tree <- rpart(happy ~ gdp_per_capita + social_support + life_expectancy + freedom + generosity + corruption, data = train)
 mod_tree
 ```
 
@@ -123,15 +124,102 @@ printcp(mod_tree)
 ```
 
 ```{r}
-#train_tree <- 
- # train %>%
- # mutate(happy_dtree = predict(mod_tree, type = class))
-#confusion <- tally(happy_dtree ~ happy, data = train_tree, format = count)
-#confusion
+train_tree <- 
+  train %>%
+  mutate(happy_dtree = predict(mod_tree, type = "class"))
+
+confusion <- tally(happy_dtree ~ happy, data = train_tree, format = "count")
+confusion
 ```
 
 ```{r}
-#dtree_acc <- sum(diag(confusion)) / nrow(train) * 100
-#dtree_acc
+dtree_acc <- sum(diag(confusion)) / nrow(train) * 100
+dtree_acc
 ```
+
+
+
+
+
+### K-Nearest Neighbor
+
+```{r}
+#install.packages('mdsr')
+library(mdsr)
+#install.packages('nycflights13')
+library(nycflights13)
+library(tidyverse)
+library(lubridate)
+library(mosaic)
+library(googlesheets)
+library(babynames)
+library(Hmisc)
+library(dplyr)
+#install.packages('Lahman')
+library(Lahman)
+library(rvest)
+library(methods)
+library(readr)
+library(rpart)
+library(partykit)
+#install.packages('randomForest')
+library(randomForest)
+library(tibble)
+library(class)
+#install.packages('e1071')
+library(e1071)
+library(nnet)
+#install.packages("ROCR")
+library(ROCR)
+#install.packages("NHANES")
+library(NHANES)
+
+```
+
+
+```{r}
+require(class)
+Happy2019$gdp_per_capita<-as.numeric(as.integer(factor(Happy2019$gdp_per_capita)))
+train_quant <- 
+  Happy2019 %>%
+  select(gdp_per_capita)
+# KNN classifier
+
+
+happy_knn <- knn(train = train_quant, test = train_quant, cl = Happy2019$happy, k = 5)
+# confusion matrix
+
+confusion <- tally(happy_knn ~ happy, data = Happy2019, format = "count")
+
+
+knn_acc <- sum(diag(confusion)) / nrow(train_quant) * 100
+knn_acc
+```
+
+
+### Logistic Regression Model
+
+
+```{r}
+# logistic
+mod_logit <- glm(happy ~ gdp_per_capita, data = train, family = 'binomial')
+msummary(mod_logit)
+
+happy_logitProb <- predict(mod_logit, newdata = train, type = 'response')
+happy_logit <- ifelse(happy_logitProb > 0.5, yes = 'yes', 'no')
+confusion <- tally(happy_logit ~ happy, data = train, format = 'count')
+
+
+logit_acc <- sum(diag(confusion)) / nrow(train) * 100
+logit_acc
+
+#Trying
+```
+
+
+
+
+
+
+
 
