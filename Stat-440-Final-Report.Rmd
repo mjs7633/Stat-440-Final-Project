@@ -47,8 +47,8 @@ Happy2019 <-
     generosity = Generosity,
     corruption = Perceptions.of.corruption
 ) %>%
-  mutate(happy = as.factor(ifelse(score >= 5, "yes", "no")))
-
+  mutate(happy = as.factor(ifelse(score >= 5, "yes", "no")),
+         wealthy = as.factor(ifelse(gdp_per_capita >= 1, "yes", "no")))
 Happy2019
 
 
@@ -64,7 +64,8 @@ Happy2018 <-
     generosity = Generosity,
     corruption = Perceptions.of.corruption
 ) %>%
-  mutate(happy = as.factor(ifelse(score >= 5, "yes", "no")))
+  mutate(happy = as.factor(ifelse(score >= 5, "yes", "no")),
+         wealthy = as.factor(ifelse(gdp_per_capita >= 1, "yes", "no")))
 
 Happy2018
 ```
