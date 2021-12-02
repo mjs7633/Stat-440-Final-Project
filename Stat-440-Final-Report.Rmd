@@ -211,6 +211,7 @@ confusion <- tally(happy_logit ~ happy, data = train, format = 'count')
 logit_acc <- sum(diag(confusion)) / nrow(train) * 100
 logit_acc
 
+#Trying
 ```
 
 
