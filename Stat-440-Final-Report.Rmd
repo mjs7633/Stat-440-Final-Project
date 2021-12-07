@@ -50,7 +50,7 @@ Happy2019 <-
 ) %>%
   mutate(happy = as.factor(ifelse(score >= 5, "yes", "no")),
          wealthy = as.factor(ifelse(gdp_per_capita >= 1, "yes", "no")))
-Happy2019
+head(Happy2019)
 
 
 Happy2018 <-
@@ -68,7 +68,7 @@ Happy2018 <-
   mutate(happy = as.factor(ifelse(score >= 5, "yes", "no")),
          wealthy = as.factor(ifelse(gdp_per_capita >= 1, "yes", "no")))
 
-Happy2018
+head(Happy2018)
 ```
 
 
@@ -83,7 +83,7 @@ train <- Happy2019[-test_idx,]
 nrow(train)
 test <- Happy2019[test_idx,]
 nrow(test)
-train
+head(train)
 
 #pairs(train)
 ```
@@ -214,7 +214,7 @@ knn_acc
 ```{r}
 #Naive Bayes
 head(train, 1)
-train
+head(train)
 
 tally(wealthy ~ happy, data = train, margins = TRUE)
 tally( ~ wealthy, data = train, margins = TRUE)
