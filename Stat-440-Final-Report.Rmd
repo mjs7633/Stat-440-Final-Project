@@ -234,7 +234,7 @@ nb_acc
 ```{r}
 #Artificial Neural Networks
 require(nnet)
-mod_nnet <- nnet(happy ~ ., data = train, size = 7)
+mod_nnet <- nnet(happy ~ ., data = train, size = 6)
 happy_nn <- predict(mod_nnet, newdata = train, type = "class")
 confusion <- tally(happy_nn ~ happy, data = train, format = "count")
 confusion
