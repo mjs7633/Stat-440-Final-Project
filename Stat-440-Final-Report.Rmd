@@ -206,7 +206,6 @@ happy_knn <- knn(train = train_quant, test = train_quant, cl = Happy2019$happy, 
 
 confusion <- tally(happy_knn ~ happy, data = Happy2019, format = "count")
 
-
 knn_acc <- sum(diag(confusion)) / nrow(train_quant) * 100
 knn_acc
 ```
@@ -222,7 +221,9 @@ tally( ~ happy, data = train, margins = TRUE)
 
 require(e1071)  # awful name for a package...
 
-mod_nb <- naiveBayes(happy ~ ., data = train)
+train
+mod_nb <- naiveBayes(happy ~ wealthy+social_support+life_expectancy+freedom+generosity+corruption+gdp_per_capita, data = train)
+
 happy_nb <- predict(mod_nb, newdata = train)
 confusion <- tally(happy_nb ~ happy, data = train, format = "count")
 confusion
