@@ -268,7 +268,7 @@ logit_acc
 ModelComparison <- 
   tribble(
   ~model, ~accuracy, 
-  "**NULL MODEL**", mod_null[1], 
+  "**NULL MODEL**", (mod_null[2]/(mod_null[1]+mod_null[2])), 
   "decision tree", dtree_acc, 
   "random forest", rf_acc, 
   "k-nearest neighbors", knn_acc, 
