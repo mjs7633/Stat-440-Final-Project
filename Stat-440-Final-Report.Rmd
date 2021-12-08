@@ -221,7 +221,6 @@ tally( ~ happy, data = train, margins = TRUE)
 
 require(e1071)  # awful name for a package...
 
-train
 mod_nb <- naiveBayes(happy ~ wealthy+social_support+life_expectancy+freedom+generosity+corruption+gdp_per_capita, data = train)
 
 happy_nb <- predict(mod_nb, newdata = train)
@@ -235,7 +234,10 @@ nb_acc
 ```{r}
 #Artificial Neural Networks
 require(nnet)
-mod_nnet <- nnet(happy ~ ., data = train, size = 7)
+#mod_nnet <- nnet(happy ~ ., data = train, size = 7)
+
+mod_nnet <- nnet(happy ~ wealthy+social_support+life_expectancy+freedom+generosity+corruption+gdp_per_capita, data = train, size = 7)
+
 happy_nn <- predict(mod_nnet, newdata = train, type = "class")
 confusion <- tally(happy_nn ~ happy, data = train, format = "count")
 confusion
