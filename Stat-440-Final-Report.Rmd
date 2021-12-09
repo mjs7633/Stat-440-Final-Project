@@ -205,6 +205,7 @@ happy_knn <- knn(train = train_quant, test = train_quant, cl = Happy2019$happy, 
 # confusion matrix
 
 confusion <- tally(happy_knn ~ happy, data = Happy2019, format = "count")
+confusion
 
 knn_acc <- sum(diag(confusion)) / nrow(train_quant) * 100
 knn_acc
