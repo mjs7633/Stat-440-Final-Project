@@ -9,6 +9,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 rm(list = ls())
+
 library("readxl")
 library("dplyr")
 library("tidyr")
@@ -16,11 +17,22 @@ library("ggplot2")
 library("mosaic")
 library("stats")
 library("rpart")
-#install.packages("partykit")
 library("partykit")
 library("randomForest")
 library("tibble")
 library("gbm")
+library("mdsr")
+library("tidyverse")
+library("lubridate")
+library("rvest")
+library("methods")
+library("readr")
+library("randomForest")
+library("tibble")
+library("class")
+library("e1071")
+library("nnet")
+
 set.seed(440)
 ```
 
@@ -73,6 +85,7 @@ head(Happy2018)
 
 
 ## Partition the Data
+
 ```{r}
 set.seed(440)
 
@@ -90,12 +103,13 @@ head(train)
 
 
 ### Null Model
+
 ```{r}
 mod_null <- tally(~ happy, data = train)
 mod_null
 ```
 
-
+## Models 
 
 ### Decision Tree (simple)
 ```{r}
@@ -113,8 +127,8 @@ train %>%
 ```
 
 
-
 ### Decision Tree (Complete)
+
 ```{r}
 mod_tree <- rpart(happy ~ gdp_per_capita + social_support + life_expectancy + freedom + generosity + corruption, data = train)
 mod_tree
@@ -139,6 +153,7 @@ confusion
 dtree_acc <- sum(diag(confusion)) / nrow(train) * 100
 dtree_acc
 ```
+
 
 ### Random Forrest
 
@@ -174,25 +189,6 @@ msummary(mod_boost)
 ### K-Nearest Neighbor
 
 ```{r}
-#install.packages('mdsr')
-library(mdsr)
-library(tidyverse)
-library(lubridate)
-library(mosaic)
-library(rvest)
-library(methods)
-library(readr)
-#install.packages('randomForest')
-library(randomForest)
-library(tibble)
-library(class)
-#install.packages('e1071')
-library(e1071)
-library(nnet)
-```
-
-
-```{r}
 require(class)
 Happy2019$gdp_per_capita<-as.numeric(as.integer(factor(Happy2019$gdp_per_capita)))
 train_quant <- 
@@ -207,14 +203,17 @@ happy_knn <- knn(train = train_quant, test = train_quant, cl = Happy2019$happy, 
 confusion <- tally(happy_knn ~ happy, data = Happy2019, format = "count")
 confusion
 
+
 knn_acc <- sum(diag(confusion)) / nrow(train_quant) * 100
 knn_acc
 ```
 
+
+###Naive Bayes
+
 ```{r}
-#Naive Bayes
 head(train, 1)
-head(train)
+train
 
 tally(wealthy ~ happy, data = train, margins = TRUE)
 tally( ~ wealthy, data = train, margins = TRUE)
@@ -222,8 +221,7 @@ tally( ~ happy, data = train, margins = TRUE)
 
 require(e1071)  # awful name for a package...
 
-mod_nb <- naiveBayes(happy ~ wealthy+social_support+life_expectancy+freedom+generosity+corruption+gdp_per_capita, data = train)
-
+mod_nb <- naiveBayes(happy ~ ., data = train)
 happy_nb <- predict(mod_nb, newdata = train)
 confusion <- tally(happy_nb ~ happy, data = train, format = "count")
 confusion
@@ -235,10 +233,7 @@ nb_acc
 ```{r}
 #Artificial Neural Networks
 require(nnet)
-#mod_nnet <- nnet(happy ~ ., data = train, size = 7)
-
-mod_nnet <- nnet(happy ~ wealthy+social_support+life_expectancy+freedom+generosity+corruption+gdp_per_capita, data = train, size = 7)
-
+mod_nnet <- nnet(happy ~ ., data = train, size = 7)
 happy_nn <- predict(mod_nnet, newdata = train, type = "class")
 confusion <- tally(happy_nn ~ happy, data = train, format = "count")
 confusion
@@ -250,7 +245,6 @@ nnet_acc
 
 
 ### Logistic Regression Model
-
 
 ```{r}
 # logistic
@@ -269,11 +263,13 @@ logit_acc
 ```
 
 
+### Model Comparison
+
 ```{r}
 ModelComparison <- 
   tribble(
   ~model, ~accuracy, 
-  "**NULL MODEL**", mod_null[1], 
+  "**NULL MODEL**", (mod_null[2]/(mod_null[1]+mod_null[2])), 
   "decision tree", dtree_acc, 
   "random forest", rf_acc, 
   "k-nearest neighbors", knn_acc, 
