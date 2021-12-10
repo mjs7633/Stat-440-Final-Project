@@ -1,6 +1,6 @@
 ---
 title: "Stat 440 Final Project"
-author: "Matthew Secen"
+author: "Vince Birch, Kim Mincin, and Matthew Secen"
 date: "11/30/2021"
 output: html_document
 ---
@@ -213,7 +213,7 @@ knn_acc
 
 ```{r}
 head(train, 1)
-train
+head(train)
 
 tally(wealthy ~ happy, data = train, margins = TRUE)
 tally( ~ wealthy, data = train, margins = TRUE)
@@ -269,7 +269,7 @@ logit_acc
 ModelComparison <- 
   tribble(
   ~model, ~accuracy, 
-  "**NULL MODEL**", (mod_null[2]/(mod_null[1]+mod_null[2])), 
+  "**NULL MODEL**", (mod_null[2]/(mod_null[1]+mod_null[2])*100), 
   "decision tree", dtree_acc, 
   "random forest", rf_acc, 
   "k-nearest neighbors", knn_acc, 
